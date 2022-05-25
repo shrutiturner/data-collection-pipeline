@@ -26,9 +26,12 @@ class Scraper:
     def load_page(self, url) -> None:
         self.driver.get(url)
 
-        # going to have to deal with popups, as justgiving has them sometimes when changing page - most close with esc
         sleep(2) # there is a slight delay for cookie frame to appear on justgiving
-        self.accept_cookies()
+        
+        try:
+            self.accept_cookies()
+        except:
+            pass
 
 
     def accept_cookies(self) -> None:
@@ -37,11 +40,11 @@ class Scraper:
             accept_button.click()
 
         except Exception as e:
-            Logger.log_error(e)
+            Logger.log_error(str(e))
             pass
 
     
-    def find_category_urls(self) -> dict:
+    def get_category_urls(self) -> dict:
 
         categories_location = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
 
@@ -52,13 +55,34 @@ class Scraper:
         return(category_urls)
 
 
-    def get_fundraisers(self, n=6): # n=6 to remove need for load more button click for initial code
-        # find the urls for the top n fundraisers listed and put them in a list
-        pass
+    def get_fundraiser_urls(self, n=6) -> list: # n=6 to remove need for load more button click for initial code
+
+        #if n>6:
+        #calculate how many times (x) to click load more and how many of the urls to save
+        #click load more x times
+        
+        fundraisers_location = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
+
+        fundraisers = self.driver.find_elements(by=By.XPATH, value=fundraisers_location)
+
+        fundraiser_urls = [fundraiser.get_attribute('href') for fundraiser in fundraisers] #add indexing here related to load more
+
+        return(fundraiser_urls)
+
 
     def run(self):
         self.load_page('https://www.justgiving.com')
-        self.find_category_urls()
+        category_urls = self.get_category_urls()
+
+        fundraisers_dict = {}
+
+        for category, url in category_urls.items():
+            self.load_page(url)
+            fundraiser_urls = self.get_fundraiser_urls()
+
+            fundraisers_dict[category] = fundraiser_urls  
+
+        print(fundraisers_dict)
 
 
 scraper = Scraper()
