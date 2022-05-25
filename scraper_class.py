@@ -1,3 +1,5 @@
+import logging
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -5,10 +7,19 @@ from selenium.webdriver.chrome.options import Options
 from time import sleep
 
 
+class Logger:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def log_error(exception):
+        with open('error_log.txt', 'a') as file:
+            file.write(exception)
+
+
 class Scraper:
     def __init__(self):
         self.driver = webdriver.Chrome()
-
     
     def load_page(self, url):
         self.driver.get(url)
@@ -25,8 +36,7 @@ class Scraper:
 
         # need proper exception handling here
         except Exception as e:
-            print('Unable to find accept button')
-            print(e)
+            Logger.log_error(e)
             pass
 
 
