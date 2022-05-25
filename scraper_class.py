@@ -41,16 +41,20 @@ class Scraper:
             pass
 
     
-    def find_category_urls(self) -> list:
+    def find_category_urls(self) -> dict:
 
-        categories_location = '//*[@id="app"]/main/div[4]/div/section/h2//following-sibling::ul//descendant::a'
+        categories_location = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
 
         categories = self.driver.find_elements(by=By.XPATH, value=categories_location)
 
-        category_urls = [category.get_attribute('href') for category in categories]
+        category_urls = {category.text: category.get_attribute('href') for category in categories}
 
         return(category_urls)
 
+
+    def get_fundraisers(self, n=6): # n=6 to remove need for load more button click for initial code
+        # find the urls for the top n fundraisers listed and put them in a list
+        pass
 
     def run(self):
         self.load_page('https://www.justgiving.com')
