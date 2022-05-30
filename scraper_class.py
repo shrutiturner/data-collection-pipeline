@@ -83,6 +83,19 @@ class Scraper:
         return(fundraiser_urls)
 
 
+    def get_identifiers(self, fundraisers_dict) -> dict:
+
+        id_dict = {} #creates new dictionary with unique id as key so in future attributes can be added to array for each
+
+        for category, urls in fundraisers_dict.items():
+            for url in urls:
+                id = url.rpartition('/')[-1]
+                id_dict[id] = category
+
+        return(id_dict)
+
+
+
 if __name__ == "__main__":
 
         scraper = Scraper()
@@ -99,5 +112,5 @@ if __name__ == "__main__":
 
             fundraisers_dict[category] = fundraiser_urls
 
-        print(fundraisers_dict)
+        print(scraper.get_identifiers(fundraisers_dict))
 
