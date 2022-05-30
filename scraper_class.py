@@ -56,7 +56,7 @@ class Scraper:
         return(category_urls)
 
 
-    def get_fundraiser_urls(self, n=10) -> list:
+    def get_fundraiser_urls(self, n) -> list:
 
         if n > 6:
 
@@ -69,7 +69,6 @@ class Scraper:
             while count < num_clicks:
                 sleep(2)
                 try:
-                    print('Im trying')
                     load_more_button.click()
                     count += 1
                 except AttributeError:
@@ -84,20 +83,21 @@ class Scraper:
         return(fundraiser_urls)
 
 
-    def run(self):
-        self.load_page('https://www.justgiving.com')
-        category_urls = self.get_category_urls()
+if __name__ == "__main__":
+
+        scraper = Scraper()
+
+        scraper.load_page('https://www.justgiving.com')
+        
+        category_urls = scraper.get_category_urls()
 
         fundraisers_dict = {}
 
         for category, url in category_urls.items():
-            self.load_page(url)
-            fundraiser_urls = self.get_fundraiser_urls()
+            scraper.load_page(url)
+            fundraiser_urls = scraper.get_fundraiser_urls(1) #input argument = number of urls wanted
 
-            fundraisers_dict[category] = fundraiser_urls 
+            fundraisers_dict[category] = fundraiser_urls
 
-
-scraper = Scraper()
-scraper.run()
-
+        print(fundraisers_dict)
 
