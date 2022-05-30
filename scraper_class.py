@@ -2,6 +2,7 @@ import logging
 from nis import cat
 from unicodedata import category
 
+from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -46,26 +47,39 @@ class Scraper:
     
     def get_category_urls(self) -> dict:
 
-        categories_location = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
+        categories_locator = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
 
-        categories = self.driver.find_elements(by=By.XPATH, value=categories_location)
+        categories = self.driver.find_elements(by=By.XPATH, value=categories_locator)
 
         category_urls = {category.text: category.get_attribute('href') for category in categories}
 
         return(category_urls)
 
 
-    def get_fundraiser_urls(self, n=6) -> list: # n=6 to remove need for load more button click for initial code
+    def get_fundraiser_urls(self, n=10) -> list:
 
-        #if n>6:
-        #calculate how many times (x) to click load more and how many of the urls to save
-        #click load more x times
+        if n > 6:
+
+            num_clicks = ceil(n / 6)
+            count = 0
+
+            load_more_locator = "//*[@data-testid='jg-search-load-next-page--fundraiser']"
+            load_more_button = self.driver.find_element(by=By.XPATH, value=load_more_locator)
+
+            while count < num_clicks:
+                sleep(2)
+                try:
+                    print('Im trying')
+                    load_more_button.click()
+                    count += 1
+                except AttributeError:
+                    print("There are no more fundraisers!")
+                    break
+
         
-        fundraisers_location = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
-
-        fundraisers = self.driver.find_elements(by=By.XPATH, value=fundraisers_location)
-
-        fundraiser_urls = [fundraiser.get_attribute('href') for fundraiser in fundraisers] #add indexing here related to load more
+        fundraisers_locator = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
+        fundraisers = self.driver.find_elements(by=By.XPATH, value=fundraisers_locator)
+        fundraiser_urls = [fundraiser.get_attribute('href') for fundraiser in fundraisers][:n]
 
         return(fundraiser_urls)
 
@@ -80,9 +94,7 @@ class Scraper:
             self.load_page(url)
             fundraiser_urls = self.get_fundraiser_urls()
 
-            fundraisers_dict[category] = fundraiser_urls  
-
-        print(fundraisers_dict)
+            fundraisers_dict[category] = fundraiser_urls 
 
 
 scraper = Scraper()
