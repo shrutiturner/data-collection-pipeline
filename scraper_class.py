@@ -5,10 +5,9 @@ from unicodedata import category
 from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 from time import sleep
-from time import time
+from uuid import uuid4
+
 
 
 class Logger:
@@ -87,16 +86,16 @@ class Scraper:
 
     def get_identifiers(self, url_string) -> str:
 
-        id = url_string.rpartition('/')[-1]
+        dict_id = url_string.rpartition('/')[-1]
 
-        return(id)
+        return(dict_id)
 
 
     def get_fundraisers(self, category, num_pages) -> dict:
 
         fundraiser_urls = self.get_fundraiser_urls(num_pages)
 
-        fundraisers_dict = {self.get_identifiers(url): {'url': url, 'category': category, 'uuid' : None} for url in fundraiser_urls}
+        fundraisers_dict = {self.get_identifiers(url): {'url': url, 'category': category, 'id' : uuid4()} for url in fundraiser_urls}
 
         return(fundraisers_dict)
 
