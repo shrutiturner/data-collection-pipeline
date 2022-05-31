@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from time import sleep
+from time import time
 
 
 class Logger:
@@ -24,6 +25,7 @@ class Scraper:
     def __init__(self):
         self.driver = webdriver.Chrome()
     
+
     def load_page(self, url) -> None:
         self.driver.get(url)
 
@@ -83,34 +85,37 @@ class Scraper:
         return(fundraiser_urls)
 
 
-    def get_identifiers(self, fundraisers_dict) -> dict:
+    def get_identifiers(self, url_string) -> str:
 
-        id_dict = {} #creates new dictionary with unique id as key so in future attributes can be added to array for each
+        id = url_string.rpartition('/')[-1]
 
-        for category, urls in fundraisers_dict.items():
-            for url in urls:
-                id = url.rpartition('/')[-1]
-                id_dict[id] = category
+        return(id)
 
-        return(id_dict)
+
+    def get_fundraisers(self, category, num_pages) -> dict:
+
+        fundraiser_urls = self.get_fundraiser_urls(num_pages)
+
+        fundraisers_dict = {self.get_identifiers(url): {'url': url, 'category': category, 'uuid' : None} for url in fundraiser_urls}
+
+        return(fundraisers_dict)
 
 
 
 if __name__ == "__main__":
 
-        scraper = Scraper()
+    scraper = Scraper()
 
-        scraper.load_page('https://www.justgiving.com')
-        
-        category_urls = scraper.get_category_urls()
+    scraper.load_page('https://www.justgiving.com')
+    
+    category_urls = scraper.get_category_urls()
 
-        fundraisers_dict = {}
+    fundraisers_dict = {}
 
-        for category, url in category_urls.items():
-            scraper.load_page(url)
-            fundraiser_urls = scraper.get_fundraiser_urls(1) #input argument = number of urls wanted
+    for category, url in category_urls.items():
+        scraper.load_page(url)
+        fundraisers_dict = {**scraper.get_fundraisers(category, 6), **fundraisers_dict} #input argument = number of urls wanted
 
-            fundraisers_dict[category] = fundraiser_urls
+    print(fundraisers_dict)
 
-        print(scraper.get_identifiers(fundraisers_dict))
-
+    scraper.driver.close()
