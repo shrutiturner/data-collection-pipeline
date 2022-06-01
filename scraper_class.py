@@ -1,6 +1,7 @@
 import json
 import logging
 from nis import cat
+import os
 from unicodedata import category
 
 from math import ceil
@@ -162,10 +163,17 @@ class Scraper:
         return(data)
 
     
-    def write_json(self, data) -> None:
+    def write_json(self, category, data) -> None:
         
-        with open('raw_data/data.json', 'w') as data_file:
+        path = f'raw_data/{category}'
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with open(path + '/data.json', 'w') as data_file:
             json.dump(data, data_file)
+
+        return None
 
 
 if __name__ == "__main__":
@@ -176,19 +184,17 @@ if __name__ == "__main__":
         
         category_urls = scraper.get_category_urls()
 
-        fundraisers_dict = {}
-
         for category, url in category_urls.items():
             scraper.load_page(url)
-            fundraisers_dict = {**fundraisers_dict, **scraper.get_fundraisers(category, 1)} #input argument = number of urls wanted
-     
-        for id, attributes in fundraisers_dict.items():
-            scraper.load_page(attributes['url'])
-            fundraisers_dict[id] = {**attributes, **scraper.get_fundraiser_info()}
+            fundraisers_dict = scraper.get_fundraisers(category, 2) #input argument = number of urls wanted
 
-        print(fundraisers_dict)
+            for id, attributes in fundraisers_dict.items():
+                scraper.load_page(attributes['url'])
+                fundraisers_dict[id] = {**attributes, **scraper.get_fundraiser_info()}
 
-        scraper.write_json(fundraisers_dict)
+            print(fundraisers_dict)
+
+            scraper.write_json(category, fundraisers_dict)
     
     finally:
         scraper.driver.close()
