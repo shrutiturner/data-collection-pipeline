@@ -1,3 +1,4 @@
+import json
 import logging
 from nis import cat
 from unicodedata import category
@@ -91,7 +92,7 @@ class Scraper:
     def get_fundraisers(self, category, num_pages) -> dict:
 
         fundraiser_urls = self.get_fundraiser_urls(num_pages)
-        fundraisers_dict = {self.get_identifiers(url): {'url': url, 'category': category, 'id' : uuid4()} for url in fundraiser_urls}
+        fundraisers_dict = {self.get_identifiers(url): {'url': url, 'category': category, 'id' : str(uuid4())} for url in fundraiser_urls}
 
         return(fundraisers_dict)
 
@@ -160,6 +161,12 @@ class Scraper:
 
         return(data)
 
+    
+    def write_json(self, data) -> None:
+        
+        with open('raw_data/data.json', 'w') as data_file:
+            json.dump(data, data_file)
+
 
 if __name__ == "__main__":
     scraper = Scraper()
@@ -180,6 +187,8 @@ if __name__ == "__main__":
             fundraisers_dict[id] = {**attributes, **scraper.get_fundraiser_info()}
 
         print(fundraisers_dict)
+
+        scraper.write_json(fundraisers_dict)
     
     finally:
         scraper.driver.close()
