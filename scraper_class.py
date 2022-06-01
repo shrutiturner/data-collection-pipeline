@@ -98,7 +98,7 @@ class Scraper:
 
     def get_fundraiser_charity(self) -> str:
         try:
-            charity_locator = "//*[@id='content']/div/div[1]/div/section[3]/section/div/h2/a"
+            charity_locator = "(//*[@data-qa='relationship-name-link'])[1]"
             charity = self.driver.find_element(by=By.XPATH, value=charity_locator)
 
             return(charity.text)
@@ -109,7 +109,7 @@ class Scraper:
 
     def get_fundraiser_total(self) -> str:
         try:
-            total_locator = "//*[@id='content']/div/div[1]/div/div/section[1]/figcaption/div[1]"
+            total_locator = "(//*[@data-qa='totaliser-message']//span)[1]"
             total = self.driver.find_element(by=By.XPATH, value=total_locator)
 
             return(total.text)
@@ -120,7 +120,7 @@ class Scraper:
 
     def get_fundraiser_donor_num(self) -> str:
         try:
-            donor_num_locator = "//*[@id='content']/div/div[1]/div/div/section[1]/figcaption/div[2]/span"
+            donor_num_locator = "(//*[@data-qa='totaliser-message']//span)[2]"
             donor_num = self.driver.find_element(by=By.XPATH, value=donor_num_locator)
             number = donor_num.text.rpartition(' ')[0]
 
@@ -132,7 +132,7 @@ class Scraper:
 
     def get_fundraiser_image_url(self) -> str:
         try:
-            image_locator = "//*[@id='content']/div/div[1]/div/section[1]/div/img"
+            image_locator = "(//*[@data-qa='app']//img)[1]"
             image_url = self.driver.find_element(by=By.XPATH, value=image_locator).get_attribute('src')
 
             return(image_url)
@@ -143,8 +143,7 @@ class Scraper:
     
     def get_charity_image_url(self) -> str:
         try:
-            charity_image_locator = "//*[@id='content']/div/div[1]/div/section[3]/section/a//img"
-            
+            charity_image_locator = "(//*[@data-qa='owner-logo']//img)[1]"            
             charity_image_url = self.driver.find_element(by=By.XPATH, value=charity_image_locator).get_attribute('src')
 
             return(charity_image_url)
