@@ -8,6 +8,7 @@ from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
+from urllib.request import urlretrieve
 from uuid import uuid4
 
 
@@ -175,6 +176,32 @@ class Scraper:
 
         return None
 
+    
+    def download_charity_image(self, data) -> None:
+
+        path = f"raw_data/{data['category']}/{data['slug']}"
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+
+        image = urlretrieve(data['charity_image'], path + '/charity_image.jpg')
+
+        return(None)
+
+
+    def download_fundraiser_image(self, data) -> None:
+
+        path = f"raw_data/{data['category']}/{data['slug']}"
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+
+        image = urlretrieve(data['fundraiser_image'], path + '/fundraiser_image.jpg')
+
+        return(None)
+
 
 if __name__ == "__main__":
     scraper = Scraper()
@@ -194,6 +221,8 @@ if __name__ == "__main__":
             scraper.load_page(fundraiser['url'])
             fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
             scraper.write_json(fundraiser)
+            scraper.download_charity_image(fundraiser)
+            scraper.download_fundraiser_image(fundraiser)
         
     
     finally:
