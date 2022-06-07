@@ -166,9 +166,6 @@ class Scraper:
     
     def write_json(self, data, path) -> None:
 
-        if not os.path.exists(path):
-            os.makedirs(path)
-
         with open(path + '/data.json', 'a') as data_file:
             json.dump(data, data_file)
 
@@ -176,9 +173,6 @@ class Scraper:
 
     
     def download_image(self, path, image_url, image_name) -> None:
-
-        if not os.path.exists(path):
-            os.makedirs(path)
 
         urlretrieve(image_url, path + '/' + image_name)
 
@@ -205,6 +199,9 @@ if __name__ == "__main__":
             fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
 
             path = f"raw_data/{fundraiser['category']}/{fundraiser['slug']}"
+
+            if not os.path.exists(path):
+                os.makedirs(path)
 
             scraper.write_json(fundraiser, path)
             scraper.download_image(path, fundraiser['charity_image'], 'charity_image.jpg')
