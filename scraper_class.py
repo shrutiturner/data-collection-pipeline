@@ -164,9 +164,7 @@ class Scraper:
         return(data)
 
     
-    def write_json(self, data) -> None:
-        
-        path = f"raw_data/{data['category']}/{data['slug']}"
+    def write_json(self, data, path) -> None:
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -177,30 +175,15 @@ class Scraper:
         return None
 
     
-    def download_charity_image(self, data) -> None:
-
-        path = f"raw_data/{data['category']}/{data['slug']}"
+    def download_image(self, path, image_url, image_name) -> None:
 
         if not os.path.exists(path):
             os.makedirs(path)
 
-
-        image = urlretrieve(data['charity_image'], path + '/charity_image.jpg')
-
-        return(None)
-
-
-    def download_fundraiser_image(self, data) -> None:
-
-        path = f"raw_data/{data['category']}/{data['slug']}"
-
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-
-        image = urlretrieve(data['fundraiser_image'], path + '/fundraiser_image.jpg')
+        urlretrieve(image_url, path + '/' + image_name)
 
         return(None)
+
 
 
 if __name__ == "__main__":
@@ -220,9 +203,12 @@ if __name__ == "__main__":
         for fundraiser in fundraisers:
             scraper.load_page(fundraiser['url'])
             fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
-            scraper.write_json(fundraiser)
-            scraper.download_charity_image(fundraiser)
-            scraper.download_fundraiser_image(fundraiser)
+
+            path = f"raw_data/{fundraiser['category']}/{fundraiser['slug']}"
+
+            scraper.write_json(fundraiser, path)
+            scraper.download_image(path, fundraiser['charity_image'], 'charity_image.jpg')
+            scraper.download_image(path, fundraiser['fundraiser_image'], 'fundraiser_image.jpg')
         
     
     finally:
