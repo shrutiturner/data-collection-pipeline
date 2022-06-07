@@ -229,7 +229,9 @@ if __name__ == "__main__":
             scraper.download_image(path, fundraiser['charity_image'], 'charity_image.jpg')
             scraper.download_image(path, fundraiser['fundraiser_image'], 'fundraiser_image.jpg')
         
-    except:
+
+    except Exception as e:
+        Logger.log_error(str(e))
 
     finally:
         scraper.driver.close()
