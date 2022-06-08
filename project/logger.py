@@ -9,3 +9,5 @@ class Logger:
         """
         with open('error_log.txt', 'a') as file:
             file.write(exception)
+
+        return None

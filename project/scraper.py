@@ -1,7 +1,7 @@
 import json
 import os
 
-from logger import Logger
+from project.logger import Logger
 from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
