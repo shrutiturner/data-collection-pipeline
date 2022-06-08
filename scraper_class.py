@@ -146,7 +146,16 @@ class Scraper:
 
 
     def download_image(self, path, image_url, image_name) -> None:
+        """This function dowloads the image located at the image_url, to a the provided path with the image_name.
 
+        Args:
+            path (str): Local path for the image to be saved to.
+            image_url (str): The url of the image to be downloaded.
+            image_name (str): The name to be assigned to the saved image.
+
+        Returns:
+            None: Image is saved but nothing is returned.
+        """
         try:
             urlretrieve(image_url, path + '/' + image_name)
         
@@ -158,7 +167,12 @@ class Scraper:
 
 
     def get_category_urls(self) -> list:
+        """Charity categories are found on the website homepage to return a list of dictionaries with the category name 
+        and url of the page listing the information for the category.
 
+        Returns:
+            list: A list of dictionaries with the KVPs of each category {catgegory name: category url}.
+        """
         categories_locator = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
         categories = self.__get_elements(categories_locator)
         category_urls = [{'category': category.text, 'url': category.get_attribute('href')} for category in categories]
@@ -167,7 +181,11 @@ class Scraper:
 
 
     def get_fundraiser_info(self) -> dict:
-        
+        """Relevant data is scraped from the fundraiser webpage and stored in a dictionary.
+
+        Returns:
+            dict: A dictionary mapping the scraped data to what the data is e.g. {'charity': charity name}
+        """
         data = {'charity': self.__get_fundraiser_charity(),
         'charity_image': self.__get_charity_image_url(), 'total': self.__get_fundraiser_total(), 
         'donor_num': self.__get_fundraiser_donor_num(), 'fundraiser_image': self.__get_fundraiser_image_url()}
@@ -176,7 +194,16 @@ class Scraper:
 
 
     def get_fundraisers(self, category, num_pages) -> list:
+        """Initial information about the chosen number of fundraisers is scraped and stored in a list of 
+        dictionaries for the given category.
 
+        Args:
+            category (str): The charity category for which to scrape fundraiser data.
+            num_pages (int): The number of fundraisers from which to scrape data.
+
+        Returns:
+            list: A list of dictionaries each piece of data to what the data is {'url': fundraiser url}.
+        """
         fundraiser_urls = self.__get_fundraiser_urls(num_pages)
         fundraisers = [{'slug': self.__get_slug(url), 'url': url, 'category': category, 'id' : str(uuid4())} for url in fundraiser_urls]
 
@@ -184,7 +211,14 @@ class Scraper:
 
 
     def load_page(self, url) -> None:
+        """Loads the webpage with a given url in Google Chrome.
 
+        Args:
+            url (str): URL of target webpage to be loaded.
+
+        Returns:
+            None: Page loads but returns nothing.
+        """
         self.driver.get(url)
 
         sleep(2) # there is a slight delay for cookie frame to appear on justgiving
@@ -195,7 +229,15 @@ class Scraper:
 
     
     def write_json(self, data, path) -> None:
+        """The data is saved in a JSON file to the given path.
 
+        Args:
+            data (dict): Dictionary containing the scraped data.
+            path (str): Location to save the json file to.
+
+        Returns:
+            None: Data is saved to JSON file but nothing is returned.
+        """
         with open(path + '/data.json', 'a') as data_file:
             json.dump(data, data_file)
 
