@@ -15,34 +15,10 @@ class Scraper:
     def __init__(self):
         self.driver = webdriver.Chrome()
     
-
-    def load_page(self, url) -> None:
-        self.driver.get(url)
-
-        sleep(2) # there is a slight delay for cookie frame to appear on justgiving
-        
-        self.accept_cookies()
-
-        return None
-
-
-    def get_elements(self, locator) -> list:
-        
-        elements = self.driver.find_elements(by=By.XPATH, value=locator)
-
-        return elements
-
     
-    def get_element(self, locator) -> object:
-        
-        element = self.driver.find_element(by=By.XPATH, value=locator)
-
-        return element
-
-
-    def accept_cookies(self) -> None:
+    def __accept_cookies(self) -> None:
         try:
-            accept_button = self.get_element('//*[@id="accept-all-Cookies"]')
+            accept_button = self.__get_element('//*[@id="accept-all-Cookies"]')
             accept_button.click()
 
         except AttributeError:
@@ -51,18 +27,36 @@ class Scraper:
         except Exception as e:
             Logger.log_error(str(e))
             pass
-    
-
-    def get_category_urls(self) -> list:
-
-        categories_locator = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
-        categories = self.get_elements(categories_locator)
-        category_urls = [{'category': category.text, 'url': category.get_attribute('href')} for category in categories]
-
-        return category_urls
 
 
-    def get_fundraiser_urls(self, n) -> list:
+    def __get_charity_image_url(self) -> str:
+        try:
+            charity_image_locator = "(//*[@data-qa='owner-logo']//img)[1]"            
+            charity_image_url = self.__get_element(charity_image_locator).get_attribute('src')
+
+            return charity_image_url
+
+        except Exception as e:
+            Logger.log_error(str(e))
+
+            return None  
+
+
+    def __get_element(self, locator) -> object:
+        
+        element = self.driver.find_element(by=By.XPATH, value=locator)
+
+        return element
+
+
+    def __get_elements(self, locator) -> list:
+        
+        elements = self.driver.find_elements(by=By.XPATH, value=locator)
+
+        return elements
+
+
+    def __get_fundraiser_urls(self, n) -> list:
 
         if n > 6:
 
@@ -70,7 +64,7 @@ class Scraper:
             count = 0
 
             load_more_locator = "//*[@data-testid='jg-search-load-next-page--fundraiser']"
-            load_more_button = self.get_element(load_more_locator)
+            load_more_button = self.__get_element(load_more_locator)
 
             while count < num_clicks:
                 sleep(2)
@@ -82,34 +76,19 @@ class Scraper:
                     break
                 except Exception as e:
                     Logger.log_error(str(e))
-                    pass
+                    break
         
         fundraisers_locator = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
-        fundraisers = self.get_elements(fundraisers_locator)
+        fundraisers = self.__get_elements(fundraisers_locator)
         fundraiser_urls = [fundraiser.get_attribute('href') for fundraiser in fundraisers][:n]
 
         return fundraiser_urls
 
 
-    def get_slug(self, url_string) -> str:
-
-        slug = url_string.rpartition('/')[-1]
-
-        return slug
-
-
-    def get_fundraisers(self, category, num_pages) -> list:
-
-        fundraiser_urls = self.get_fundraiser_urls(num_pages)
-        fundraisers = [{'slug': self.get_slug(url), 'url': url, 'category': category, 'id' : str(uuid4())} for url in fundraiser_urls]
-
-        return fundraisers
-
-
-    def get_fundraiser_charity(self) -> str:
+    def __get_fundraiser_charity(self) -> str:
         try:
             charity_locator = "(//*[@data-qa='relationship-name-link'])[1]"
-            charity = self.get_element(charity_locator)
+            charity = self.__get_element(charity_locator)
 
             return charity.text
 
@@ -119,23 +98,10 @@ class Scraper:
             return None
 
 
-    def get_fundraiser_total(self) -> str:
-        try:
-            total_locator = "(//*[@data-qa='totaliser-total'])"
-            total = self.get_element(total_locator)
-
-            return total.text.replace('£', '')
-
-        except Exception as e:
-            Logger.log_error(str(e))
-
-            return None
-
-
-    def get_fundraiser_donor_num(self) -> str:
+    def __get_fundraiser_donor_num(self) -> str:
         try:
             donor_num_locator = "(//*[@data-qa='totaliser-message']/span[contains(text(), 'supporter')])"
-            donor_num = self.get_element(donor_num_locator)
+            donor_num = self.__get_element(donor_num_locator)
             number = donor_num.text.rpartition(' ')[0] # remove the ' supporter(s)' and get only number
 
             return number
@@ -146,10 +112,10 @@ class Scraper:
             return None
 
 
-    def get_fundraiser_image_url(self) -> str:
+    def __get_fundraiser_image_url(self) -> str:
         try:
             image_locator = "(//*[@data-qa='app']//img)[1]"
-            image_url = self.get_element(image_locator).get_attribute('src')
+            image_url = self.__get_element(image_locator).get_attribute('src')
 
             return image_url
 
@@ -158,37 +124,27 @@ class Scraper:
 
             return None
 
-    
-    def get_charity_image_url(self) -> str:
-        try:
-            charity_image_locator = "(//*[@data-qa='owner-logo']//img)[1]"            
-            charity_image_url = self.get_element(charity_image_locator).get_attribute('src')
 
-            return charity_image_url
+    def __get_fundraiser_total(self) -> str:
+        try:
+            total_locator = "(//*[@data-qa='totaliser-total'])"
+            total = self.__get_element(total_locator)
+
+            return total.text.replace('£', '')
 
         except Exception as e:
             Logger.log_error(str(e))
 
             return None
 
-    
-    def get_fundraiser_info(self) -> dict:
-        
-        data = {'charity': self.get_fundraiser_charity(),
-        'charity_image': self.get_charity_image_url(), 'total': self.get_fundraiser_total(), 
-        'donor_num': self.get_fundraiser_donor_num(), 'fundraiser_image': self.get_fundraiser_image_url()}
 
-        return data
+    def __get_slug(self, url_string) -> str:
 
-    
-    def write_json(self, data, path) -> None:
+        slug = url_string.rpartition('/')[-1]
 
-        with open(path + '/data.json', 'a') as data_file:
-            json.dump(data, data_file)
+        return slug 
 
-        return None
 
-    
     def download_image(self, path, image_url, image_name) -> None:
 
         try:
@@ -199,6 +155,51 @@ class Scraper:
 
         finally:
             return None
+
+
+    def get_category_urls(self) -> list:
+
+        categories_locator = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
+        categories = self.__get_elements(categories_locator)
+        category_urls = [{'category': category.text, 'url': category.get_attribute('href')} for category in categories]
+
+        return category_urls
+
+
+    def get_fundraiser_info(self) -> dict:
+        
+        data = {'charity': self.__get_fundraiser_charity(),
+        'charity_image': self.__get_charity_image_url(), 'total': self.__get_fundraiser_total(), 
+        'donor_num': self.__get_fundraiser_donor_num(), 'fundraiser_image': self.__get_fundraiser_image_url()}
+
+        return data
+
+
+    def get_fundraisers(self, category, num_pages) -> list:
+
+        fundraiser_urls = self.__get_fundraiser_urls(num_pages)
+        fundraisers = [{'slug': self.__get_slug(url), 'url': url, 'category': category, 'id' : str(uuid4())} for url in fundraiser_urls]
+
+        return fundraisers
+
+
+    def load_page(self, url) -> None:
+
+        self.driver.get(url)
+
+        sleep(2) # there is a slight delay for cookie frame to appear on justgiving
+        
+        self.__accept_cookies()
+
+        return None
+
+    
+    def write_json(self, data, path) -> None:
+
+        with open(path + '/data.json', 'a') as data_file:
+            json.dump(data, data_file)
+
+        return None
 
 
 
