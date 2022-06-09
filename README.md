@@ -17,3 +17,8 @@ This has been a good opportunity to practice object oriented programming, implem
 Added methods to the scraper class to retrieve the relevant data from each of the fundraiser pages and save this locally. Thought was put into deciding which data may be relevant and how best to get these e.g. using more robust XPATHs rather than defaults. During this milestone, methods were refactored seveal times to ensure that each one was not reliant on previous, but only dealt with one problem focused on data structures. Work was also put in to remove the need for nest for loops for time efficiency. 
 
 The section has pushed me to consider how my code is working, not just that it does work, and appreciate the traits of different data structures to allow efficient implementation.
+
+## Milestone 4 - Documentation and Testing
+The code has a dedicated refactor (rather than just doing it along the way) to further optimise the code. Doc strings have been addeed to all public methods in the Google layout and a combination of unit and end to end tests have been written. Tests have been written only to test the code logic written, leaving out those functions that merely implement python built-in functions. The project structure, including creating build files, was also updated to be more distribution ready.
+
+This milestone has allowed me to understand some of the developer benefits of encapsulation and OOP (in terms of writing test and doc strings!), as well the computational benefits. There are many ways to test the same method and code is always a work in progress, and optimisation/refactoring is an ongoing process.
