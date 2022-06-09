@@ -1,13 +1,13 @@
 import json
 import os
+import urllib.request
 
-from logger import Logger
+from src.logger import Logger
 from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 from unicodedata import category
-from urllib.request import urlretrieve
 from uuid import uuid4
 
 
@@ -54,35 +54,6 @@ class Scraper:
         elements = self.driver.find_elements(by=By.XPATH, value=locator)
 
         return elements
-
-
-    def __get_fundraiser_urls(self, n) -> list:
-
-        if n > 6:
-
-            num_clicks = ceil(n / 6)
-            count = 0
-
-            load_more_locator = "//*[@data-testid='jg-search-load-next-page--fundraiser']"
-            load_more_button = self.__get_element(load_more_locator)
-
-            while count < num_clicks:
-                sleep(2)
-                try:
-                    load_more_button.click()
-                    count += 1
-                except AttributeError:
-                    Logger.log_error("There are no more fundraisers!")
-                    break
-                except Exception as e:
-                    Logger.log_error(str(e))
-                    break
-        
-        fundraisers_locator = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
-        fundraisers = self.__get_elements(fundraisers_locator)
-        fundraiser_urls = [fundraiser.get_attribute('href') for fundraiser in fundraisers][:n]
-
-        return fundraiser_urls
 
 
     def __get_fundraiser_charity(self) -> str:
@@ -138,6 +109,35 @@ class Scraper:
             return None
 
 
+    def __get_fundraiser_urls(self, n) -> list:
+
+        if n > 6:
+
+            num_clicks = ceil(n / 6)
+            count = 0
+
+            load_more_locator = "//*[@data-testid='jg-search-load-next-page--fundraiser']"
+            load_more_button = self.__get_element(load_more_locator)
+
+            while count < num_clicks:
+                sleep(2)
+                try:
+                    load_more_button.click()
+                    count += 1
+                except AttributeError:
+                    Logger.log_error("There are no more fundraisers!")
+                    break
+                except Exception as e:
+                    Logger.log_error(str(e))
+                    break
+        
+        fundraisers_locator = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
+        fundraisers = self.__get_elements(fundraisers_locator)
+        fundraiser_urls = [fundraiser.get_attribute('href') for fundraiser in fundraisers][:n]
+
+        return fundraiser_urls
+
+
     def __get_slug(self, url_string) -> str:
 
         slug = url_string.rpartition('/')[-1]
@@ -157,8 +157,8 @@ class Scraper:
             None: Image is saved but nothing is returned.
         """
         try:
-            urlretrieve(image_url, path + '/' + image_name)
-        
+            urllib.request.urlretrieve(image_url, path + '/' + image_name)
+
         except Exception as e:
             Logger.log_error(str(e))
 
@@ -176,7 +176,7 @@ class Scraper:
         categories_locator = "//*[text()='Browse by fundraising category']//following-sibling::ul//descendant::a"
         categories = self.__get_elements(categories_locator)
         category_urls = [{'category': category.text, 'url': category.get_attribute('href')} for category in categories]
-
+        
         return category_urls
 
 
@@ -238,11 +238,10 @@ class Scraper:
         Returns:
             None: Data is saved to JSON file but nothing is returned.
         """
-        with open(path + '/data.json', 'a') as data_file:
+        with open(path, 'a') as data_file:
             json.dump(data, data_file)
 
         return None
-
 
 
 if __name__ == "__main__":
@@ -268,7 +267,7 @@ if __name__ == "__main__":
             if not os.path.exists(path):
                 os.makedirs(path)
 
-            scraper.write_json(fundraiser, path)
+            scraper.write_json(fundraiser, path + '/data.json')
             scraper.download_image(path, fundraiser['charity_image'], 'charity_image.jpg')
             scraper.download_image(path, fundraiser['fundraiser_image'], 'fundraiser_image.jpg')
         
