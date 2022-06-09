@@ -4,21 +4,11 @@ sys.path.append("..")
 import unittest
 
 from src.scraper import Scraper
-from unittest.mock import patch, MagicMock
 
 class ScraperTestCase(unittest.TestCase):
     
     def setUp(self) -> None:
         self.scraper = Scraper()
-
-
-    @patch('urllib.request.urlretrieve')
-    def test_download_image(self, mock_urlretrieve):
-        mock_urlretrieve.return_value = MagicMock()
-
-        self.scraper.download_image('test-image-path', 'test-image-url', 'test-image-name')
-
-        mock_urlretrieve.assert_called_once_with('test-image-url', 'test-image-path/test-image-name')
 
 
     def test_get_category_urls(self):
