@@ -16,7 +16,7 @@ class ScraperTestCase(unittest.TestCase):
     def test_download_image(self, mock_urlretrieve):
         mock_urlretrieve.return_value = MagicMock()
 
-        self.scraper.download_image('test-image-path', 'test-image-url', 'test-image-name')
+        self.scraper.get_image('test-image-path', 'test-image-url', 'test-image-name')
 
         mock_urlretrieve.assert_called_once_with('test-image-url', 'test-image-path/test-image-name')
 

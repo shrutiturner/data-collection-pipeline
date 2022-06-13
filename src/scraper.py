@@ -1,19 +1,19 @@
-import json
 import os
 import urllib.request
 
-from src.logger import Logger
+from aws_port import AWS
+from logger import Logger
 from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 from unicodedata import category
-from uuid import uuid4
 
 
 class Scraper:
     def __init__(self):
         self.driver = webdriver.Chrome()
+        self.aws = AWS()
     
     
     def __accept_cookies(self) -> None:
@@ -145,27 +145,6 @@ class Scraper:
         return slug 
 
 
-    def download_image(self, path, image_url, image_name) -> None:
-        """This function dowloads the image located at the image_url, to a the provided path with the image_name.
-
-        Args:
-            path (str): Local path for the image to be saved to.
-            image_url (str): The url of the image to be downloaded.
-            image_name (str): The name to be assigned to the saved image.
-
-        Returns:
-            None: Image is saved but nothing is returned.
-        """
-        try:
-            urllib.request.urlretrieve(image_url, path + '/' + image_name)
-
-        except Exception as e:
-            Logger.log_error(str(e))
-
-        finally:
-            return None
-
-
     def get_category_urls(self) -> list:
         """Charity categories are found on the website homepage to return a list of dictionaries with the category name 
         and url of the page listing the information for the category.
@@ -205,9 +184,35 @@ class Scraper:
             list: A list of dictionaries each piece of data to what the data is {'url': fundraiser url}.
         """
         fundraiser_urls = self.__get_fundraiser_urls(num_pages)
-        fundraisers = [{'slug': self.__get_slug(url), 'url': url, 'category': category, 'id' : str(uuid4())} for url in fundraiser_urls]
+        fundraisers = [{'slug': self.__get_slug(url), 'url': url, 'category': category} for url in fundraiser_urls]
 
         return fundraisers
+
+
+    def get_image(self, fundraiser_name, image_url, image_name) -> None:
+        """This function dowloads the image located at the image_url, to a the temporary 
+        path with the image_name before being uploaded to AWS and deletes local temporary path.
+
+        Args:
+            path (str): Local path for the image to be saved to.
+            image_url (str): The url of the image to be downloaded.
+            image_name (str): The name to be assigned to the saved image.
+
+        Returns:
+            None: Image is saved but nothing is returned.
+        """
+        try:
+            temp_image_location = '/tmp/' + image_name
+            urllib.request.urlretrieve(image_url, temp_image_location)
+            s3_url = self.aws.upload_file(temp_image_location, fundraiser_name + '/' + image_name)
+
+        except Exception as e:
+            Logger.log_error(str(e))
+
+        finally:
+            os.remove(temp_image_location)
+            return s3_url
+
 
 
     def load_page(self, url) -> None:
@@ -228,8 +233,8 @@ class Scraper:
         return None
 
     
-    def write_json(self, data, path) -> None:
-        """The data is saved in a JSON file to the given path.
+    def save_data(self, data) -> None:
+        """The data is saved to the AWS RDS.
 
         Args:
             data (dict): Dictionary containing the scraped data.
@@ -238,10 +243,17 @@ class Scraper:
         Returns:
             None: Data is saved to JSON file but nothing is returned.
         """
-        with open(path, 'a') as data_file:
-            json.dump(data, data_file)
 
-        return None
+        try:
+            self.aws.write_to_rds(data)
+
+
+        except Exception as e:
+            Logger.log_error(str(e))
+
+        finally:
+            return None
+
 
 
 if __name__ == "__main__":
@@ -254,23 +266,18 @@ if __name__ == "__main__":
 
         fundraisers = []
 
-        for category in category_urls:
+        for category in category_urls[:2]:
             scraper.load_page(category['url'])
-            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 2) #input argument = number of urls wanted
+            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 10) #input argument = number of urls wanted
 
         for fundraiser in fundraisers:
             scraper.load_page(fundraiser['url'])
             fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
 
-            path = f"raw_data/{fundraiser['category']}/{fundraiser['slug']}"
+            fundraiser['charity_image'] = scraper.get_image(fundraiser['slug'], fundraiser['charity_image'], 'charity_image.jpg')
+            fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['slug'], fundraiser['fundraiser_image'], 'fundraiser_image.jpg')
 
-            if not os.path.exists(path):
-                os.makedirs(path)
-
-            scraper.write_json(fundraiser, path + '/data.json')
-            scraper.download_image(path, fundraiser['charity_image'], 'charity_image.jpg')
-            scraper.download_image(path, fundraiser['fundraiser_image'], 'fundraiser_image.jpg')
-        
+            scraper.save_data(fundraiser)
 
     except Exception as e:
         Logger.log_error(str(e))
