@@ -25,6 +25,15 @@ class AWS:
         
 
     def upload_file(self, file_name, object_name) -> str:
+        """Function takes in an existing file and saves it to the names bucket in S3 with the specified name.
+
+        Args:
+            file_name (str): Name of file to be uploaded to S3.
+            object_name (str): Desired name of file when saved in S3.
+
+        Returns:
+            str: URL of file in S3.
+        """
         self.s3_client.upload_file(file_name, BUCKET_NAME, object_name)
 
         file_url = f's3://{BUCKET_NAME}/{object_name}'
@@ -33,7 +42,14 @@ class AWS:
 
 
     def write_to_rds(self, data) -> None:
+        """Functions takes in a dictionary of data and saves this as a row to the specified database table.
 
+        Args:
+            data (dict): Dictionary of data to be saved to database.
+
+        Returns:
+            None: Code implents saving of data to cloud, but returns nothing.
+        """
         data_df = pd.DataFrame(data, index=[str(uuid4())])
         data_df.to_sql('fundraisers', self.rds_client, if_exists='append')
 
