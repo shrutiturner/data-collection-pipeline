@@ -189,22 +189,22 @@ class Scraper:
         return fundraisers
 
 
-    def get_image(self, fundraiser_name, image_url, image_name) -> None:
+    def get_image(self, image_url) -> None:
         """This function dowloads the image located at the image_url, to a the temporary 
         path with the image_name before being uploaded to AWS and deletes local temporary path.
 
         Args:
-            path (str): Local path for the image to be saved to.
             image_url (str): The url of the image to be downloaded.
-            image_name (str): The name to be assigned to the saved image.
 
         Returns:
             None: Image is saved but nothing is returned.
         """
         try:
-            temp_image_location = '/tmp/' + image_name
+            uid = image_url.replace('https://images.jg-cdn.com/image/','').split('?')[0]
+            temp_image_location = '/tmp/' + uid
             urllib.request.urlretrieve(image_url, temp_image_location)
-            s3_url = self.aws.upload_file_method(temp_image_location, fundraiser_name + '/' + image_name)
+
+            s3_url = self.aws.upload_file_method(temp_image_location, uid)
             return s3_url
 
         except Exception as e:
@@ -267,16 +267,16 @@ if __name__ == "__main__":
 
         fundraisers = []
 
-        for category in category_urls[:2]:
+        for category in category_urls:
             scraper.load_page(category['url'])
-            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 10) #input argument = number of urls wanted
+            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 100) #input argument = number of urls wanted
 
         for fundraiser in fundraisers:
             scraper.load_page(fundraiser['url'])
             fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
 
-            fundraiser['charity_image'] = scraper.get_image(fundraiser['slug'], fundraiser['charity_image'], 'charity_image.jpg')
-            fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['slug'], fundraiser['fundraiser_image'], 'fundraiser_image.jpg')
+            fundraiser['charity_image'] = scraper.get_image(fundraiser['charity_image'])
+            fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['fundraiser_image'])
 
             scraper.save_data(fundraiser)
 
