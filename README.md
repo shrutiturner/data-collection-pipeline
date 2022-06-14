@@ -22,3 +22,6 @@ The section has pushed me to consider how my code is working, not just that it d
 The code has a dedicated refactor (rather than just doing it along the way) to further optimise the code. Doc strings have been addeed to all public methods in the Google layout and a combination of unit and end to end tests have been written. Tests have been written only to test the code logic written, leaving out those functions that merely implement python built-in functions. The project structure, including creating build files, was also updated to be more distribution ready.
 
 This milestone has allowed me to understand some of the developer benefits of encapsulation and OOP (in terms of writing test and doc strings!), as well the computational benefits. There are many ways to test the same method and code is always a work in progress, and optimisation/refactoring is an ongoing process.
+
+## Milestone 5 - Scalably Store the Data
+Sets up AWS to save image data to S3 bucket and tabular data to a PostgreSQL database on the cloud. Code was updated to implement an AWS port in its own class, and the Scraper methods were updated to save to the cloud rather than locally. Scraper runs successfully with data saving to the cloud. Additional tests were written for the AWS methods using mocking. 
