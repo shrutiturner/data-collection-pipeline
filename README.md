@@ -25,3 +25,6 @@ This milestone has allowed me to understand some of the developer benefits of en
 
 ## Milestone 5 - Scalably Store the Data
 Sets up AWS to save image data to S3 bucket and tabular data to a PostgreSQL database on the cloud. Code was updated to implement an AWS port in its own class, and the Scraper methods were updated to save to the cloud rather than locally. Scraper runs successfully with data saving to the cloud. Additional tests were written for the AWS methods using mocking. 
+
+## Milestone 6 - Getting More Data
+Updates methods to ensure duplicate images are not being scraped from the website. It was deemed un-scalable to store slug names/access the database to prevent the tabular data being scraped for duplicate fundraisers, however, additional functionality has been added to prevent duplicate fundraiser data being saved to the database. Tests have been updated for the new functionality.
