@@ -44,13 +44,15 @@ class AWS:
         Returns:
             None: Code implents saving of data to cloud, but returns nothing.
         """
+
         rds_client = sqlalchemy.create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{ENDPOINT}:{PORT}/{DATABASE}")
         rds_client.connect()
-
-        duplicates = rds_client.execute(f'SELECT * FROM fundraisers WHERE fundraisers.slug == {data["slug"]}').fetchall()
+        
+        duplicates = rds_client.execute(f'SELECT * FROM fundraisers WHERE fundraisers.slug == :slug', slug=data['slug']).fetchall()
 
         if duplicates is None:
             data_df = pd.DataFrame(data, index=[str(uuid4())])
             data_df.to_sql('fundraisers', rds_client, if_exists='append')
+
 
         return None

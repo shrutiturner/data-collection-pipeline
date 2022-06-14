@@ -49,11 +49,16 @@ class ScraperTestCaseUnit(unittest.TestCase):
 
         mock_rds = MagicMock()
         mock_rds.connect.return_value = None
+
+        mock_rds_execute = MagicMock()
+        mock_rds_execute.fetchall.return_value = None
+
+        mock_rds.execute.return_value = mock_rds_execute
         mock_engine.return_value = mock_rds
 
-        self.scraper.save_data({'key': 'value', 'key2': 'value2'})
+        self.scraper.save_data({'key': 'value', 'key2': 'value2', 'slug': 'test-slug'})
         
-        mock_df.assert_called_once_with({'key': 'value', 'key2': 'value2'}, index=[ANY])
+        mock_df.assert_called_once_with({'key': 'value', 'key2': 'value2', 'slug': 'test-slug'}, index=[ANY])
         mock_DataFrame.to_sql.assert_called_once_with('fundraisers', ANY, if_exists='append')
 
 
