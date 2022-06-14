@@ -1,8 +1,9 @@
 import boto3
 import pandas as pd
+import sqlalchemy
+
 from uuid import uuid4
 
-import sqlalchemy
 
 DATABASE_TYPE = 'postgresql'
 DBAPI = 'psycopg2'
@@ -27,8 +28,12 @@ class AWS:
             str: URL of file in S3.
         """
         s3_client = boto3.client('s3')
-
-        s3_client.upload_file(file_name, BUCKET_NAME, object_name)
+        
+        try:
+            s3_client.get_object(Bucket=BUCKET_NAME, Key=object_name)
+            
+        except:
+            s3_client.upload_file(file_name, BUCKET_NAME, object_name)
 
         file_url = f's3://{BUCKET_NAME}/{object_name}'
         

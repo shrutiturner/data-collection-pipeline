@@ -1,18 +1,15 @@
 # import out unittest library 
-from re import A
 import unittest
 
 # import sys to allow us to append the system path
 import sys
-import boto3
 
-from unittest import mock 
 # append the parent folder
 sys.path.append('../') 
 
 from src.scraper import Scraper
 from unittest.mock import ANY, patch, MagicMock
-from sqlalchemy import create_engine
+
 
 
 class ScraperTestCaseUnit(unittest.TestCase):
@@ -30,14 +27,16 @@ class ScraperTestCaseUnit(unittest.TestCase):
 
         mock_s3_client = MagicMock()
         mock_s3_client.upload_file.return_value = None
+        mock_s3_client.get_object.side_effect = Exception
         mock_boto_client.return_value = mock_s3_client
 
-        actual = self.scraper.get_image('fundraiser_name', 'test-image-url', 'test-image-name')
+        actual = self.scraper.get_image('test-image-url')
         
         mock_boto_client.assert_called_once_with('s3')
-        mock_urlretrieve.assert_called_once_with('test-image-url', '/tmp/test-image-name')
-        mock_s3_client.upload_file.assert_called_once_with('/tmp/test-image-name', 'justgiving-scraper', 'fundraiser_name/test-image-name')
-        self.assertEqual("s3://justgiving-scraper/fundraiser_name/test-image-name", actual)
+        mock_urlretrieve.assert_called_once_with('test-image-url', '/tmp/test-image-url')
+        self.assertEqual("s3://justgiving-scraper/test-image-url", actual)
+        mock_s3_client.upload_file.assert_called_once_with('/tmp/test-image-url', 'justgiving-scraper', 'test-image-url')
+        
 
 
     @patch('sqlalchemy.create_engine')
