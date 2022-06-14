@@ -1,8 +1,8 @@
 import os
 import urllib.request
 
-from aws_port import AWS
-from logger import Logger
+from src.aws_port import AWS
+from src.logger import Logger
 from math import ceil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -205,14 +205,15 @@ class Scraper:
             temp_image_location = '/tmp/' + image_name
             urllib.request.urlretrieve(image_url, temp_image_location)
             s3_url = self.aws.upload_file(temp_image_location, fundraiser_name + '/' + image_name)
+            return s3_url
 
         except Exception as e:
             Logger.log_error(str(e))
 
         finally:
-            os.remove(temp_image_location)
-            return s3_url
-
+            if os.path.exists(temp_image_location):
+                os.remove(temp_image_location)
+            
 
 
     def load_page(self, url) -> None:

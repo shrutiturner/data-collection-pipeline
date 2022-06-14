@@ -1,17 +1,22 @@
-import sys
-sys.path.append("..")
-
+# import out unittest library 
 import unittest
 
-from src.scraper import Scraper
+# import sys to allow us to append the system path
+import sys 
+# append the parent folder
+sys.path.append('../') 
 
-class ScraperTestCase(unittest.TestCase):
+# import out class located in "src" and then in 
+from src.aws_port import AWS 
+from src.scraper import Scraper 
+
+class ScraperTestCaseE2E(unittest.TestCase):
     
     def setUp(self) -> None:
         self.scraper = Scraper()
+        self.aws = AWS()
 
-
-    def test_get_category_urls(self):
+    def test_get_category_urls(self) -> None:
         
         self.scraper.load_page('https://www.justgiving.com')
 
@@ -28,7 +33,7 @@ class ScraperTestCase(unittest.TestCase):
         self.assertAlmostEqual('https://www.justgiving.com/search?q=animals%20and%20pets&type=onesearch', actual_first_category['url'])
 
 
-    def test_get_fundraiser_info(self):
+    def test_get_fundraiser_info(self) -> None:
         
         test_url = 'https://www.justgiving.com/fundraising/benenden-health'
         self.scraper.load_page(test_url)
@@ -47,7 +52,7 @@ class ScraperTestCase(unittest.TestCase):
         self.assertAlmostEqual('https://images.jg-cdn.com/image/54f9b6b0-375e-4259-ad29-1f663a996343.jpg?template=Size120x120', actual_fundraiser_info['charity_image'])
 
 
-    def test_get_fundraisers(self):
+    def test_get_fundraisers(self) -> None:
         
         test_url = 'https://www.justgiving.com/search?q=animals%20and%20pets&type=onesearch'
         self.scraper.load_page(test_url)
@@ -62,12 +67,10 @@ class ScraperTestCase(unittest.TestCase):
         self.assertIn('slug', actual_fundraiser)
         self.assertIn('url', actual_fundraiser)
         self.assertIn('category', actual_fundraiser)
-        self.assertIn('id', actual_fundraiser)
 
         self.assertIs(str, type(actual_fundraiser['slug']))
         self.assertIs(str, type(actual_fundraiser['url']))
         self.assertIs(str, type(actual_fundraiser['category']))
-        self.assertIs(str, type(actual_fundraiser['id']))
 
 
     def tearDown(self) -> None:

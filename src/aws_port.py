@@ -2,9 +2,7 @@ import boto3
 import pandas as pd
 from uuid import uuid4
 
-from sqlalchemy import create_engine
-
-
+import sqlalchemy
 
 DATABASE_TYPE = 'postgresql'
 DBAPI = 'psycopg2'
@@ -19,8 +17,7 @@ BUCKET_NAME = 'justgiving-scraper'
 class AWS:
     def __init__(self) -> None:
         self.s3_client = boto3.client('s3')
-        
-        self.rds_client = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{ENDPOINT}:{PORT}/{DATABASE}")
+        self.rds_client = sqlalchemy.create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{ENDPOINT}:{PORT}/{DATABASE}")
         self.rds_client.connect()
         
 
