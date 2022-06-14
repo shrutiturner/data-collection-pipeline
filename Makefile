@@ -1,8 +1,5 @@
 test:
-	python3 -m unittest
-
-setup:
-	pip install .
+	python -m unittest
 
 run:
-	python3 src/scraper.py
+	python -m src.scraper
