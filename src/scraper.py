@@ -204,7 +204,7 @@ class Scraper:
         try:
             temp_image_location = '/tmp/' + image_name
             urllib.request.urlretrieve(image_url, temp_image_location)
-            s3_url = self.aws.upload_file(temp_image_location, fundraiser_name + '/' + image_name)
+            s3_url = self.aws.upload_file_method(temp_image_location, fundraiser_name + '/' + image_name)
             return s3_url
 
         except Exception as e:
