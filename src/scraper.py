@@ -12,11 +12,10 @@ from unicodedata import category
 
 class Scraper:
     def __init__(self):
-        # self.driver = webdriver.Chrome()
         options = webdriver.ChromeOptions()
         options.add_argument('--no-sandbox')
         options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--remote-debugging-port=9222")
+        options.add_argument("--single-process")
         options.add_argument('--headless')
         options.add_argument("--start-maximized")
         options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005 Safari/537.36'")
@@ -277,17 +276,18 @@ if __name__ == "__main__":
         fundraisers = []
 
         for category in category_urls:
+            print(category)
             scraper.load_page(category['url'])
-            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 100) #input argument = number of urls wanted
+            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 1) #input argument = number of urls wanted
 
-        for fundraiser in fundraisers:
-            scraper.load_page(fundraiser['url'])
-            fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
+        # for fundraiser in fundraisers:
+        #     scraper.load_page(fundraiser['url'])
+        #     fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
 
-            fundraiser['charity_image'] = scraper.get_image(fundraiser['charity_image'])
-            fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['fundraiser_image'])
+        #     fundraiser['charity_image'] = scraper.get_image(fundraiser['charity_image'])
+        #     fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['fundraiser_image'])
 
-            scraper.save_data(fundraiser)
+        #     scraper.save_data(fundraiser)
 
     except Exception as e:
         Logger.log_error(str(e))

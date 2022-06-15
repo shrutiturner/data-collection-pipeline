@@ -1,8 +1,0 @@
-boto3
-math
-os
-pandas
-pscopg2-binary
-selenium
-sqlalchemy
-uuid
