@@ -1,0 +1,15 @@
+README.md
+setup.cfg
+setup.py
+justgiving_web_scraper.egg-info/PKG-INFO
+justgiving_web_scraper.egg-info/SOURCES.txt
+justgiving_web_scraper.egg-info/dependency_links.txt
+justgiving_web_scraper.egg-info/requires.txt
+justgiving_web_scraper.egg-info/top_level.txt
+src/__init__.py
+src/aws_port.py
+src/logger.py
+src/scraper.py
+tests/__init__.py
+tests/test_scraper_e2e.py
+tests/test_scraper_unit.py

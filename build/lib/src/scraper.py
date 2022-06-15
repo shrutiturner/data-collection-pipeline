@@ -12,16 +12,7 @@ from unicodedata import category
 
 class Scraper:
     def __init__(self):
-        # self.driver = webdriver.Chrome()
-        options = webdriver.ChromeOptions()
-        options.add_argument('--no-sandbox')
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--remote-debugging-port=9222")
-        options.add_argument('--headless')
-        options.add_argument("--start-maximized")
-        options.add_argument("user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005 Safari/537.36'")
-        self.driver = webdriver.Chrome(options = options)
-
+        self.driver = webdriver.Chrome()
         self.aws = AWS()
     
     

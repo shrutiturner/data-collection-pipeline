@@ -9,5 +9,5 @@ setup(
     author='Shruti Turner',
     license='MIT',
     packages=find_packages(),
-    install_requires=['boto3', 'math', 'os', 'pandas', 'pscopg2-binary', 'selenium', 'sqlalchemy' 'time', 'unicodedata', 'urllib.request', 'uuid'],
+    install_requires=['boto3', 'pandas', 'selenium', 'sqlalchemy', 'uuid'],
 )
