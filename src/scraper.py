@@ -269,7 +269,7 @@ if __name__ == "__main__":
 
         for category in category_urls:
             scraper.load_page(category['url'])
-            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 100) #input argument = number of urls wanted
+            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 5) #input argument = number of urls wanted
 
         for fundraiser in fundraisers:
             scraper.load_page(fundraiser['url'])
