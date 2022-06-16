@@ -6,3 +6,4 @@ notes.txt
 error_log.txt
 raw_data
 .vscode
+.env

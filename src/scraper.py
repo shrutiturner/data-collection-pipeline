@@ -33,7 +33,7 @@ class Scraper:
             pass # if accept cookies button isn't there, move on
 
         except Exception as e:
-            Logger.log_error(str(e))
+            # Logger.log_error(e)
             pass
 
 
@@ -45,7 +45,7 @@ class Scraper:
             return charity_image_url
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
             return None  
 
@@ -72,7 +72,7 @@ class Scraper:
             return charity.text
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
             return None
 
@@ -86,7 +86,7 @@ class Scraper:
             return number
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
             return None
 
@@ -99,7 +99,7 @@ class Scraper:
             return image_url
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
             return None
 
@@ -112,7 +112,7 @@ class Scraper:
             return total.text.replace('£', '')
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
             return None
 
@@ -136,7 +136,7 @@ class Scraper:
                     Logger.log_error("There are no more fundraisers!")
                     break
                 except Exception as e:
-                    Logger.log_error(str(e))
+                    Logger.log_error(e)
                     break
         
         fundraisers_locator = "//*[text()='Fundraisers']/parent::div//following-sibling::div//descendant::a"
@@ -216,7 +216,7 @@ class Scraper:
             return s3_url
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
         finally:
             if os.path.exists(temp_image_location):
@@ -258,7 +258,7 @@ class Scraper:
 
 
         except Exception as e:
-            Logger.log_error(str(e))
+            Logger.log_error(e)
 
         finally:
             return None
@@ -268,29 +268,41 @@ class Scraper:
 if __name__ == "__main__":
     scraper = Scraper()
 
+    print("Starting Web Scraper")
+
     try:
+        print("Loading JustGiving")
         scraper.load_page('https://www.justgiving.com')
         
+        print("Collecting categories")
         category_urls = scraper.get_category_urls()
 
         fundraisers = []
 
-        for category in category_urls:
-            print(category)
+        CATEGORIES_TO_FETCH = 1
+        FUNDRAISERS_TO_FETCH = 2
+
+
+        i = 1
+        for category in category_urls[:CATEGORIES_TO_FETCH]:
+            print(f'Fetching category {i}/{CATEGORIES_TO_FETCH}')
             scraper.load_page(category['url'])
-            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], 1) #input argument = number of urls wanted
+            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], FUNDRAISERS_TO_FETCH) #input argument = number of urls wanted
+            i+=1
+            
+        i = 1
+        for fundraiser in fundraisers:
+            print(f'Fetching fundraiser {i}/{FUNDRAISERS_TO_FETCH}')
+            scraper.load_page(fundraiser['url'])
+            fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
 
-        # for fundraiser in fundraisers:
-        #     scraper.load_page(fundraiser['url'])
-        #     fundraiser = {**fundraiser, **scraper.get_fundraiser_info()}
-
-        #     fundraiser['charity_image'] = scraper.get_image(fundraiser['charity_image'])
-        #     fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['fundraiser_image'])
-
-        #     scraper.save_data(fundraiser)
+            fundraiser['charity_image'] = scraper.get_image(fundraiser['charity_image'])
+            fundraiser['fundraiser_image'] = scraper.get_image(fundraiser['fundraiser_image'])
+            scraper.save_data(fundraiser)
+            i+=1
 
     except Exception as e:
-        Logger.log_error(str(e))
+        Logger.log_error(e)
 
     finally:
         scraper.driver.close()
