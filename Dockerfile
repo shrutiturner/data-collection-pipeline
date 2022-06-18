@@ -9,16 +9,17 @@ RUN sudo python3 -m pip install awscli
 # --------------------------------
 # PROVIDE THE KEYS BELOW
 # --------------------------------
-ENV AWS_ACCESS_KEY_ID  *******TO_PROVIDE*******
-ENV AWS_SECRET_ACCESS_KEY *******TO_PROVIDE*******
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 
-RUN sudo aws configure set region us-west-2 --profile default
-RUN sudo aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID --profile default
-RUN sudo aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY --profile default
+
+RUN aws configure set region eu-west-2
+RUN aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+RUN aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
 
 # Install psycopg2
 RUN sudo apt-get -y install libpq-dev gcc
-RUN pip install psycopg2
+RUN sudo python3 -m pip install psycopg2-binary
 
 COPY . .
 
