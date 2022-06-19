@@ -28,3 +28,8 @@ Sets up AWS to save image data to S3 bucket and tabular data to a PostgreSQL dat
 
 ## Milestone 6 - Getting More Data
 Updates methods to ensure duplicate images are not being scraped from the website. It was deemed un-scalable to store slug names/access the database to prevent the tabular data being scraped for duplicate fundraisers, however, additional functionality has been added to prevent duplicate fundraiser data being saved to the database. Tests have been updated for the new functionality.
+
+## Milestone 7 - Containerise Scraper and Run on Cloud Server
+Containerised the scraper application using Docker to create a Dcoker Image which was pushed to DockerHub. To run the scraper remote, an EC2 instance was created, which was connected to the S3 bucket and RDS PostgreSQL database. Care was taken around ensuring security group allowed access to the database from the EC2 instance only (rather than from localhost as set up previously). 
+
+This milestone has given me practice working with AWS and the start of productionising code.
