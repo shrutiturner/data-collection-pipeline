@@ -287,7 +287,7 @@ if __name__ == "__main__":
         for category in category_urls[:CATEGORIES_TO_FETCH]:
             print(f'Fetching category {i}/{CATEGORIES_TO_FETCH}')
             scraper.load_page(category['url'])
-            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], FUNDRAISERS_TO_FETCH) #input argument = number of urls wanted
+            fundraisers = fundraisers + scraper.get_fundraisers(category['category'], FUNDRAISERS_TO_FETCH)
             i+=1
             
         i = 1
