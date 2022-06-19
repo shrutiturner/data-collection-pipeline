@@ -3,7 +3,9 @@ AiCore project to learn about data collection pipelines using web scraping examp
 
 This README documents the actions taken and decisions made during each step of the project.
 
-Technologies used: Python (math, os, selenium, time, unicodedata, urllib, uuid)
+Technologies used: Python (boto3, math, os, selenium, setuptools, sqlalchemy time, unicodedata, urllib, uuid), Grafana, Prometheus, Docker
+
+To run the scraper, pull the docker image `docker pull shrutiturner/scraper` and run `docker run shrutiturner/scraper`.
 
 ## Milestone 1 - Decide Target Website
 Chose 'https://www.justgiving.com' to scrape due to the amount of different types of data on the website. The charitable sectors is very large and data insights could help maximise fundraising by understanding donor and fundraiser behaviours.
