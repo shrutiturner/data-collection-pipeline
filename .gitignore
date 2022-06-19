@@ -1,6 +1,9 @@
 **/__pycache__
+build/**
+dist/**
 notes.txt
 .DS_Store
 error_log.txt
 raw_data
 .vscode
+.env
