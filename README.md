@@ -30,6 +30,13 @@ Sets up AWS to save image data to S3 bucket and tabular data to a PostgreSQL dat
 Updates methods to ensure duplicate images are not being scraped from the website. It was deemed un-scalable to store slug names/access the database to prevent the tabular data being scraped for duplicate fundraisers, however, additional functionality has been added to prevent duplicate fundraiser data being saved to the database. Tests have been updated for the new functionality.
 
 ## Milestone 7 - Containerise Scraper and Run on Cloud Server
-Containerised the scraper application using Docker to create a Dcoker Image which was pushed to DockerHub. To run the scraper remote, an EC2 instance was created, which was connected to the S3 bucket and RDS PostgreSQL database. Care was taken around ensuring security group allowed access to the database from the EC2 instance only (rather than from localhost as set up previously). 
+Containerised the scraper application using Docker to create a Dcoker Image which was pushed to DockerHub. To run the scraper remote, an EC2 instance was created, which was connected to the S3 bucket and RDS PostgreSQL database. Care was taken around ensuring security group allowed access to the database from the EC2 instance only (rather than from localhost as set up previously). As part of this, used GitHub secrets for authentication credentials to ensure these were not comitted in the code and accidentally made public, posing a security risk.
 
 This milestone has given me practice working with AWS and the start of productionising code.
+
+
+## Milestone 8 - Monitoring and Alerting
+Set up a Prometheus container inside the EC2 instance to monitor the docker container running the scraper and the hardware metrics of the EC2 instance. To view these emtircs, Grafana was used to create a dashboard for monitoring.
+
+## Milestone 9 - Setup CI/CD Pipeline
+Created a GitHub Action that is triggered on a push to the main branch of the repository to build the Docker image and push it to my DockerHub account.
